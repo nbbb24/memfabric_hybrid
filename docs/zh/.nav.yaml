@@ -1,0 +1,33 @@
+nav:
+  - 首页: index.md
+  - Roadmap: wiki/Roadmap.md
+  - 版本说明: release_notes.md
+  - 案例库:
+      - memfabric-ZBAL+SGL+DSV4推理吞吐提升案例: wiki/examples/memfabric-ZBAL+SGL+DSV4推理吞吐提升案例.md
+  - 设计文档:
+      - A5-ZBAL-D&C+Classic算子功能设计文档: wiki/design/A5-ZBAL-D&C+Classic算子功能设计文档.md
+      - ZBAL在训练场景的方案设计: wiki/design/ZBAL在训练场景的方案设计.md
+      - join-leave流程设计: wiki/design/join-leave流程设计.md
+  - 特性介绍:
+      - ConfigStore集群管理原理解析及基于etcd的高可用方案: wiki/features_instruction/ConfigStore集群管理原理解析及基于etcd的高可用方案.md
+      - MemFabric的client故障解决方案: wiki/features_instruction/MemFabric的client故障解决方案.md
+      - MemFabric的etcd后端使用与部署指导: wiki/features_instruction/MemFabric的etcd后端使用与部署指导.md
+      - MemFabric内存管理: wiki/features_instruction/MemFabric内存管理.md
+  - 用户指南:
+      - SGLang 集成指南: wiki/user_guide/SGLang 集成指南.md
+      - vllm ascend + mooncake对接memfabric_hybrid部署指南: wiki/user_guide/vllm ascend + mooncake对接memfabric_hybrid部署指南.md
+  - 开发者指南:
+      - 本地构建文档: wiki/developer_guide/build_docs.md
+  - FAQ:
+      - 常见问题及解决办法: wiki/FAQ/FAQ.md
+      - HOST_SHM 内存分配 FAQ: wiki/FAQ/HOST_SHM 内存分配 FAQ.md
+  - 其他:
+      - 分支策略: wiki/分支策略.md
+      - 环境连通性检查: wiki/环境连通性检查.md
+      - 开发与发布节奏原则: wiki/开发与发布节奏原则.md
+      - 三方 GPU 设备通过 RDMA 直连鲲鹏服务器的 MemFabric 内存池: wiki/三方 GPU 设备通过 RDMA 直连鲲鹏服务器的 MemFabric 内存池.md
+      - 通过共享内存fd提供host侧GVA内存和批量复制带部分失败接口说明: wiki/通过共享内存fd提供host侧GVA内存和批量复制带部分失败接口说明.md
+      - A5 1G大页配置教程: wiki/A5 1G大页配置教程.md
+      - DEVICE_RDMA 内存申请: wiki/DEVICE_RDMA 内存申请.md
+      - Memfarbic-Hybrid管理面新旧方案对比: wiki/Memfarbic-Hybrid管理面新旧方案对比.md
+      - Numa亲和内存分配: wiki/Numa亲和内存分配.md
