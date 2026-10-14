@@ -499,9 +499,9 @@ flowchart LR
 ## 5. 现有技术
 
 - **AscendC kernel_operator**：A3/A5 统一编程模型，差异由 CANN 头文件吸收，本提案沿用其 `GlobalTensor`/`LocalTensor`/`DataCopyPad`/`SyncFunc` 抽象。
-- **A3 现有 ZBAL 实现**：[classic/](classic/) 与 [dispatch_combine_normal/](dispatch_combine_normal/) 已建立 A3/A5 双宏守卫范式，本提案将 Low Latency 路径对齐该范式。
-- **PyTorch process group 适配**：[zbal_pytorch_process_group.cpp](pytorch_npu/) 提供 c10d Backend 接入，硬件无关，A5 直接复用。
-- **DeepEP 适配**：[zbal_deepep.cpp](deepep/) 在 A5 上调用 D&C Normal/Low Latency，不依赖 fused_deep_moe。
+- **A3 现有 ZBAL 实现**：[classic/](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/classic/) 与 [dispatch_combine_normal/](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/dispatch_combine_normal/) 已建立 A3/A5 双宏守卫范式，本提案将 Low Latency 路径对齐该范式。
+- **PyTorch process group 适配**：[zbal_pytorch_process_group.cpp](../../../../app/zbal/src/csrc/adaptor/pytorch_npu/) 提供 c10d Backend 接入，硬件无关，A5 直接复用。
+- **DeepEP 适配**：[zbal_deepep.cpp](../../../../app/zbal/src/csrc/adaptor/deepep/) 在 A5 上调用 D&C Normal/Low Latency，不依赖 fused_deep_moe。
 
 差异点：本提案强调"单代码库 + 宏隔离"而非分叉，区别于一般多硬件移植项目的双代码库思路。
 
