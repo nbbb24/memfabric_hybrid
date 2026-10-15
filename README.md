@@ -37,22 +37,6 @@ MemFabric roadmap和版本分支策略详见：[**Roadmap**](https://gitcode.com
 
 ![architecture](./docs/zh/source/architecture.png)
 
-如上图所示, MemFabric主要分为四大模块: Global Memory Management、Data Operation、Transport Management、API
-
-  * **Global Memory Management**: 实现全局统一内存地址(Global Virtual Address, GVA)的统一编排、页表映射策略制定及通过驱动将映射策略注入页表
-  * **Data Operation**: xcopy的实现，驱动xDMA、LD/ST实现全局内存直接读写
-  * **Transport Management**: 链接管理; xcopy驱动Host RDMA、Device RDMA、UDMA时，需要建立QP、Jetty链接，xcopy使用SDMA、MTE、LD/ST时不需要Transport Management
-  * **API**: 统一且简单的API及其实现, 包括BM API、SHM API、Trans API，三种API适用于不同的场景
-
-其中, Global Memory Management、Data Operation、Transport Management都实现了逻辑的抽象, 可以轻松扩展实现不同硬件的对接。当前已支持的南向包括:
-
-  * 昇腾A3超节点: DRAM+HBM pooling over Device UB 1.0, DRAM pooling over Host RoCE
-  * 昇腾A2服务器: DRAM+HBM pooling over Device RoCE, DRAM pooling over Host RoCE
-  * 鲲鹏服务器: DRAM pooling over Host RoCE
-  * 鲲鹏超节点: DRAM pooling over Host UB
-
-MemFabric以动态库的形式支持应用快速，简便的集成，支撑大模型KV缓存、生成式推荐缓存、强化训练参数Reshard、模型参数缓存、PD传输等多种业务场景。
-
 ## 🧩核心特性
 
 - **池化与全局统一编址**
