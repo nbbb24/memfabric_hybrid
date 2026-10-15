@@ -1,7 +1,7 @@
 # 贡献指南
 
 欢迎参与 MemFabric Hybrid！无论是修复代码、补充测试，还是完善文档和分享使用反馈，都能帮助项目改进。
-参与项目讨论和贡献时，请遵守[社区行为准则](https://gitcode.com/whytao/memfabric_hybrid/blob/develop/CODE_OF_CONDUCT.md)。
+参与项目讨论和贡献时，请遵守[社区行为准则](../../../../CODE_OF_CONDUCT.md)。
 
 ## 从哪里开始
 
@@ -183,9 +183,9 @@ bash script/ci-pre-commit-pr.sh
 
 代码贡献遵循项目的 [Mulan PSL v2 许可证](https://gitcode.com/whytao/memfabric_hybrid/blob/develop/LICENSE)。
 社区行为准则采用的许可见其
-[贡献归属](https://gitcode.com/whytao/memfabric_hybrid/blob/develop/CODE_OF_CONDUCT.md#贡献归属)。
+[贡献归属](../../../..//CODE_OF_CONDUCT.md#贡献归属)。
 
 [branch-policy]: https://gitcode.com/Ascend/memfabric_hybrid/wiki/%E5%88%86%E6%94%AF%E7%AD%96%E7%95%A5.md
 
 返回[项目首页](https://gitcode.com/whytao/memfabric_hybrid) ·
-阅读[社区行为准则](https://gitcode.com/whytao/memfabric_hybrid/blob/develop/CODE_OF_CONDUCT.md)
+阅读[社区行为准则](../../../../CODE_OF_CONDUCT.md)

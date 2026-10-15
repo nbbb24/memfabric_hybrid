@@ -261,7 +261,7 @@ Try HalMemCreate ret: -6
 
 **查看系统可用内存**
 
-运行[mem_scan.py](https://gitcode.com/Ascend/memfabric_hybrid/blob/develop/script/mem_scan.py)脚本扫描可用的物理内存：
+运行[mem_scan.py](../../../../src/smem/python/memfabric_hybrid/memfabric_hybrid/mem_scan.py)脚本扫描可用的物理内存：
 
 `python3 mem_scan.py`
 

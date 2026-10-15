@@ -1,9 +1,9 @@
 site_name: Memfabric Hybrid
 site_url: !ENV [READTHEDOCS_CANONICAL_URL, "http://127.0.0.1:8000"]
-site_author: MemCache Team
-site_description: MemCache Hybrid 项目文档
+site_author: Memfabric Hybrid Team
+site_description: Memfabric Hybrid 项目文档
 docs_dir: docs/zh
-repo_url: https://gitcode.com/whytao/memfabric_hybrid
+repo_url: https://gitcode.com/Ascend/memfabric_hybrid
 repo_name: Memfabric Hybrid
 
 theme:
