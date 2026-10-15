@@ -9,7 +9,7 @@ repo_name: Memfabric Hybrid
 theme:
   name: material
   language: zh
-  logo: assets/ascend-logo.png
+  logo: assets/ascend-favicon.png
   favicon: assets/ascend-favicon.ico
   font:
     text: Roboto
@@ -101,6 +101,7 @@ markdown_extensions:
 
 extra_css:
   - mkdocs/stylesheets/extra.css
+  - assets/navigation.css
 
 extra_javascript:
   - mkdocs/javascripts/mathjax.js
