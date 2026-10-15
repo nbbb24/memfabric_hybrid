@@ -156,7 +156,7 @@ Rank i                                  Rank j
   │                                       │ 9. WaitSyncFlag(STATE) (数据就绪)
 ```
 
-Low Latency 路径走 magicVal + atomicAdd 的轻量同步（[zbal_kernel_dispatch_low_latency.h:295-316](zbal_kernel_dispatch_low_latency.h#L295-L316)）；Normal 路径走 STATE/FLAG 双 flag 同步（[zbal_kernel_dispatch_normal.h:757-777](zbal_kernel_dispatch_normal.h#L757-L777)）。两者在 A5 上协议不变。
+Low Latency 路径走 magicVal + atomicAdd 的轻量同步（[zbal_kernel_dispatch_low_latency.h:295-316](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/dispatch_combine_low_latency/zbal_kernel_dispatch_low_latency.h)）；Normal 路径走 STATE/FLAG 双 flag 同步（[zbal_kernel_dispatch_normal.h:757-777](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/dispatch_combine_normal/zbal_kernel_dispatch_normal.h)）。两者在 A5 上协议不变。
 
 Normal 路径跨 rank 地址交换与数据直写时序（A3/A5 共用，A5 适配点已 Notes 标注）：
 
@@ -207,11 +207,11 @@ sequenceDiagram
 
 | 差异点 | A3 | A5 | 位置 | 处理方式 |
 | --- | --- | --- | --- | --- |
-| UB 总容量 | 192 KB | 256 KB | [zbal_kernel_utils.h:30-39](zbal_kernel_utils.h#L30-L39) | 已分支，A5 用 256KB/240KB |
+| UB 总容量 | 192 KB | 256 KB | [zbal_kernel_utils.h:30-39](../../../../app/zbal/src/csrc/operators/npu/aicore/common/zbal_kernel_utils.h) | 已分支，A5 用 256KB/240KB |
 | Cycle 单位 | 50 | 1000 | [zbal_defines.h:68-72](zbal_defines.h#L68-L72) | 已分支，影响超时阈值换算 |
-| MTE 原子算子类型限制 | 无限制 | CANN 9+ 限定 6 种类型（float/half/int16_t/int32_t/int8_t/bfloat16_t） | [zbal_kernel_base.h:199-247](zbal_kernel_base.h#L199-L247) | A5 用 `kMteAtomicSupported` 白名单 + `if constexpr` 静态分支，避免实例化非法类型 |
-| 浮点溢出控制 | 默认 | 需显式 `SetCtrlSpr<FLOAT_OVERFLOW_MODE_CTRL>` | [zbal_kernel_dispatch_normal.h:760-762](zbal_kernel_dispatch_normal.h#L760-L762) | A5 在 `Process()` 入口设置 `FLOAT_OVERFLOW_MODE_CTRL=60` |
-| Cast 后 V_S 同步 | 不需要 | 需要（Cast→FreeTensor 路径） | [zbal_kernel_dispatch_normal.h:464-466](zbal_kernel_dispatch_normal.h#L464-L466) | A5 在 `QuantProcess` 的 `Cast(floatLocalTemp, xInTensor, ...)` 后补 `SyncFunc<V_S>()` |
+| MTE 原子算子类型限制 | 无限制 | CANN 9+ 限定 6 种类型（float/half/int16_t/int32_t/int8_t/bfloat16_t） | [zbal_kernel_base.h:199-247](../../../../app/zbal/src/csrc/operators/npu/aicore/common/zbal_kernel_base.h) | A5 用 `kMteAtomicSupported` 白名单 + `if constexpr` 静态分支，避免实例化非法类型 |
+| 浮点溢出控制 | 默认 | 需显式 `SetCtrlSpr<FLOAT_OVERFLOW_MODE_CTRL>` | [zbal_kernel_dispatch_normal.h:760-762](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/dispatch_combine_normal/zbal_kernel_dispatch_normal.h) | A5 在 `Process()` 入口设置 `FLOAT_OVERFLOW_MODE_CTRL=60` |
+| Cast 后 V_S 同步 | 不需要 | 需要（Cast→FreeTensor 路径） | [zbal_kernel_dispatch_normal.h:464-466](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/dispatch_combine_normal/zbal_kernel_dispatch_normal.h) | A5 在 `QuantProcess` 的 `Cast(floatLocalTemp, xInTensor, ...)` 后补 `SyncFunc<V_S>()` |
 
 #### 3.3.2 需求二：Classic 算子 A5 适配
 
@@ -220,9 +220,9 @@ sequenceDiagram
 **适配工作**：
 
 1. 逐算子核查 allgather / allreduce / reducescatter / alltoallv / gather / scatter / p2p(send/recv) / broadcast / barrier 的 A5 守卫完整性，补齐缺失分支；
-2. 验证 `ZBALBaseKernel::CpGM2GM` 走 SDMA 与 MTE 两条路径在 A5 上的正确性（`dataOpType == ZBAL_DATA_OP_AIV_SDMA` 分支，[zbal_kernel_base.h:141-196](zbal_kernel_base.h#L141-L196)）；
-3. 验证 `ZBALSetFlag/ZBALGetFlag/ZBALWaitFlag`（基于 `dcciCacheline`，[zbal_kernel_utils.h:101-125](zbal_kernel_utils.h#L101-L125)）在 A5 cache 语义下正确；
-4. AIV 数量自适应：`ZBALOpGetAivBlockDim` 通过 `AclrtGetAIVCountInCurrentThread` 运行期获取物理核数（[zbal_kernel_utils.h:132-162](zbal_kernel_utils.h#L132-L162)），A3/A5 通用，无需改动。
+2. 验证 `ZBALBaseKernel::CpGM2GM` 走 SDMA 与 MTE 两条路径在 A5 上的正确性（`dataOpType == ZBAL_DATA_OP_AIV_SDMA` 分支，[zbal_kernel_base.h:141-196](../../../../app/zbal/src/csrc/operators/npu/aicore/common/zbal_kernel_base.h)）；
+3. 验证 `ZBALSetFlag/ZBALGetFlag/ZBALWaitFlag`（基于 `dcciCacheline`，[zbal_kernel_utils.h:101-125](../../../../app/zbal/src/csrc/operators/npu/aicore/common/zbal_kernel_utils.h)）在 A5 cache 语义下正确；
+4. AIV 数量自适应：`ZBALOpGetAivBlockDim` 通过 `AclrtGetAIVCountInCurrentThread` 运行期获取物理核数（[zbal_kernel_utils.h:132-162](../../../../app/zbal/src/csrc/operators/npu/aicore/common/zbal_kernel_utils.h)），A3/A5 通用，无需改动。
 
 **精度验证**：复用 [test/python/operators/](../../../../app/zbal/test/python/operators/) 下各算子的 `data_gen.py` + `test_zbal_*.py`，在 A5 环境运行 `run_all_operators.sh`。
 
@@ -249,18 +249,18 @@ flowchart TD
 
 #### 3.3.3 需求四：Dispatch&Combine Normal A5 适配
 
-**现状**：Normal 路径已完成主体 A5 适配（[zbal_kernel_dispatch_normal.h](zbal_kernel_dispatch_normal.h)、[zbal_kernel_combine_normal.h](zbal_kernel_combine_normal.h)），关键 A5 适配点已落地：
+**现状**：Normal 路径已完成主体 A5 适配（[zbal_kernel_dispatch_normal.h](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/dispatch_combine_normal/zbal_kernel_dispatch_normal.h)、[zbal_kernel_combine_normal.h](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/dispatch_combine_normal/zbal_kernel_combine_normal.h)），关键 A5 适配点已落地：
 
-- `Init` 与 `Process` 主体被 `#if defined(ZBAL_ASCEND_NPU_A3) || defined(ZBAL_ASCEND_NPU_A5)` 包裹（[L172](zbal_kernel_dispatch_normal.h#L172)、[L759](zbal_kernel_dispatch_normal.h#L759)）；
-- A5 入口 `SetCtrlSpr<FLOAT_OVERFLOW_MODE_CTRL, FLOAT_OVERFLOW_MODE_CTRL>(0)`（[L760-762](zbal_kernel_dispatch_normal.h#L760-L762)）；
-- `QuantProcess` 中 A5 专属 `SyncFunc<V_S>()`（[L464-466](zbal_kernel_dispatch_normal.h#L464-L466)）；
-- 动态量化 scale 计算 A5 增加 `+1e-12f` 防零除（[L478](zbal_kernel_dispatch_normal.h#L478)）。
+- `Init` 与 `Process` 主体被 `#if defined(ZBAL_ASCEND_NPU_A3) || defined(ZBAL_ASCEND_NPU_A5)` 包裹（[L172](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/dispatch_combine_normal/zbal_kernel_dispatch_normal.h#172)、[L759](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/dispatch_combine_normal/zbal_kernel_dispatch_normal.h#L759)）；
+- A5 入口 `SetCtrlSpr<FLOAT_OVERFLOW_MODE_CTRL, FLOAT_OVERFLOW_MODE_CTRL>(0)`（[L760-762](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/dispatch_combine_normal/zbal_kernel_dispatch_normal.h#L760-L762)）；
+- `QuantProcess` 中 A5 专属 `SyncFunc<V_S>()`（[L464-466](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/dispatch_combine_normal/zbal_kernel_dispatch_normal.h#L464-L466)）；
+- 动态量化 scale 计算 A5 增加 `+1e-12f` 防零除（[L478](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/dispatch_combine_normal/zbal_kernel_dispatch_normal.h#L478)）。
 
 **剩余工作**：
 
-1. Combine Normal 内核（[zbal_kernel_combine_normal.h](zbal_kernel_combine_normal.h)）同步补齐 A5 守卫与 `SetCtrlSpr`；
-2. 性能调优：利用 A5 更大的 `UB_MAX_SIZE=256KB` 提升 `eachRoundTokens` 批量（[L524-533](zbal_kernel_dispatch_normal.h#L524-L533)），目标带宽 90%+；
-3. 负载均衡路径 `HandleAllRankToken` / `DispatchForTargetRank` 在 A5 上精度验证（[L608-754](zbal_kernel_dispatch_normal.h#L608-L754)）。
+1. Combine Normal 内核（[zbal_kernel_combine_normal.h](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/dispatch_combine_normal/zbal_kernel_combine_normal.h)）同步补齐 A5 守卫与 `SetCtrlSpr`；
+2. 性能调优：利用 A5 更大的 `UB_MAX_SIZE=256KB` 提升 `eachRoundTokens` 批量（[L524-533](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/dispatch_combine_normal/zbal_kernel_dispatch_normal.h#L524-L533)），目标带宽 90%+；
+3. 负载均衡路径 `HandleAllRankToken` / `DispatchForTargetRank` 在 A5 上精度验证（[L608-754](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/dispatch_combine_normal/zbal_kernel_dispatch_normal.h#L608-L754)）。
 
 DispatchNormal::Process 在 A5 上的适配点与执行时序：
 
@@ -298,14 +298,14 @@ sequenceDiagram
 
 #### 3.3.4 需求一：Dispatch&Combine Low Latency A5 适配
 
-**现状**：Low Latency 路径（[zbal_kernel_dispatch_low_latency.h](zbal_kernel_dispatch_low_latency.h)、[zbal_kernel_combine_low_latency.h](zbal_kernel_combine_low_latency.h)）当前**未**包含 `ZBAL_ASCEND_NPU_A5` 守卫，是本次的主要新增工作。
+**现状**：Low Latency 路径（[zbal_kernel_dispatch_low_latency.h](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/dispatch_combine_low_latency/zbal_kernel_dispatch_low_latency.h)、[zbal_kernel_combine_low_latency.h](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/dispatch_combine_low_latency/zbal_kernel_combine_low_latency.h)）当前**未**包含 `ZBAL_ASCEND_NPU_A5` 守卫，是本次的主要新增工作。
 
 **适配设计**：
 
 1. 在 `DispatchLowLatency::Init` 与 `Process` 增设 `#if defined(ZBAL_ASCEND_NPU_A3) || defined(ZBAL_ASCEND_NPU_A5)` 守卫，对齐 Normal 路径风格；
 2. A5 入口补 `SetCtrlSpr<FLOAT_OVERFLOW_MODE_CTRL, FLOAT_OVERFLOW_MODE_CTRL>(0)`；
-3. `QuantProcess` 中 `Cast(floatLocalTemp, xInTensor, ...)` 后补 A5 专属 `SyncFunc<V_S>()`（[L933-935](zbal_kernel_dispatch_low_latency.h#L933-L935)），动态量化 scale 增加防零除 `+1e-12f`（对齐 Normal 路径 [L478](zbal_kernel_dispatch_normal.h#L478)）；
-4. `MAX_UB_SIZE = 170 * 1024`（[L35](zbal_kernel_dispatch_low_latency.h#L35)）是 Low Latency 路径私有常量，A5 上可放大至 ~230KB 以提升 `BUFFER_NUM` 命中率，减少单 buffer 回退；
+3. `QuantProcess` 中 `Cast(floatLocalTemp, xInTensor, ...)` 后补 A5 专属 `SyncFunc<V_S>()`（[L933-935](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/dispatch_combine_low_latency/zbal_kernel_dispatch_low_latency.h#L933-L935)），动态量化 scale 增加防零除 `+1e-12f`（对齐 Normal 路径 [L478](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/dispatch_combine_normal/zbal_kernel_dispatch_normal.h#L478)）；
+4. `MAX_UB_SIZE = 170 * 1024`（[L35](../../../../app/zbal/src/csrc/operators/npu/aicore/ops/dispatch_combine_low_latency/zbal_kernel_dispatch_low_latency.h#L35)）是 Low Latency 路径私有常量，A5 上可放大至 ~230KB 以提升 `BUFFER_NUM` 命中率，减少单 buffer 回退；
 5. Combine Low Latency 同步补齐对称守卫。
 
 DispatchLowLatency::Process 在 A5 上的适配点与执行时序（magicVal + atomicAdd 轻量同步）：
@@ -419,7 +419,7 @@ flowchart LR
 2. **硬编码公网地址**：内核/Host 代码中禁止出现 URL/IP/email 字面量；现有 [setup.py:355](setup.py#L355) 的 `url` 字段为项目官方 gitcode 地址，属合规例外。
 3. **资源配对**：
    - `SetAtomicAdd` 必须配对 `SetAtomicNone`（参考 [zbal_kernel_dispatch_low_latency.h:300-304](zbal_kernel_dispatch_low_latency.h#L300-L304) 范式）；
-   - `AllocTensor` 必须配对 `FreeTensor`（参考 [zbal_kernel_base.h:165-171](zbal_kernel_base.h#L165-L171)）；
+   - `AllocTensor` 必须配对 `FreeTensor`（参考 [zbal_kernel_base.h:165-171](../../../../app/zbal/src/csrc/operators/npu/aicore/common/zbal_kernel_base.h)）；
    - `SetFlag/WaitFlag` 配对，`SyncAll<true>` 跨核同步成对出现；
    - GM/UB `InitBuffer` 与算子生命周期绑定，禁止重复 Init 同一 TBuf。
 4. **日志脱敏**：`ZBAL_LOG_ERROR` / `ZBAL_OP_LOGE` 仅打印非敏感的诊断参数（rankId、groupSize、moeExpertNum、retCode 等），禁止打印数据指针内容、token 数据、scale 数值；debug 日志同理。错误返回路径需记录根因与关键参数（如 `epRankId`、`epWorldSize`、`moeExpertNum`、`shareAddrNum`），符合 AGENTS.md 错误日志规范。
@@ -487,7 +487,7 @@ flowchart LR
 
 | 风险 | 类别 | 影响 | 应对措施 |
 | --- | --- | --- | --- |
-| A5 MTE 原子类型白名单限制 | Breaking Change | `CpGM2GMMTE` 以 `uint64_t`/`long` 等非白名单类型实例化原子操作时，A5 上静默 no-op（已用 `if constexpr` 规避） | 保持 `kMteAtomicSupported` 白名单（[zbal_kernel_base.h:222-246](zbal_kernel_base.h#L222-L246)）；新增原子调用点必须复核类型 |
+| A5 MTE 原子类型白名单限制 | Breaking Change | `CpGM2GMMTE` 以 `uint64_t`/`long` 等非白名单类型实例化原子操作时，A5 上静默 no-op（已用 `if constexpr` 规避） | 保持 `kMteAtomicSupported` 白名单（[zbal_kernel_base.h:222-246](../../../../app/zbal/src/csrc/operators/npu/aicore/common/zbal_kernel_base.h)）；新增原子调用点必须复核类型 |
 | Low Latency 路径 A5 守卫缺失 | 功能缺失 | 需求一无法达成 | 按 3.3.4 补齐 `Init/Process/QuantProcess` 守卫与 `SetCtrlSpr`/`V_S` |
 | A5 cycle unit 放大 20x | 可靠性 | 超时检测换算偏差，可能延迟告警 | 已在 `zbal_defines.h` 分支处理；验证 `TIMEOUT_DETECTION_THRESHOLD` 在 A5 实际cycle下仍为合理 wall-clock |
 | fused_deep_moe A3 专属 | 兼容性 | A5 用户无法使用 fused_deep_moe | CMake 自动跳过（[CMakeLists.txt:68-71](CMakeLists.txt#L68-L71)）；DeepEP 适配层在 A5 退化为 D&C Normal+Gemm 分离调用 |
@@ -511,7 +511,7 @@ flowchart LR
 
 - [ ] A5 上 `UB_MAX_SIZE=256KB` 时 Low Latency 路径私有 `MAX_UB_SIZE`（当前写死 170KB）应放大到何值最优？需性能实验确定（建议 230KB，预留 26KB 给 flag/workspace）。
 - [ ] A5 `SetCtrlSpr<FLOAT_OVERFLOW_MODE_CTRL>` 是否需要应用到 Classic 八算子？还是仅限含 Cast/量化路径的 D&C 算子？需 A5 精度实验确认。
-- [ ] A5 上 `ZBAL_DATA_OP_AIV_SDMA` 与 MTE 路径的性能临界点是否与 A3 一致？需在 [ZBALOpGetAivBlockDim](zbal_kernel_utils.h#L132-L162) 的 `allgatherRankCoreMapping` 中补充 A5 数据点。
+- [ ] A5 上 `ZBAL_DATA_OP_AIV_SDMA` 与 MTE 路径的性能临界点是否与 A3 一致？需在 [ZBALOpGetAivBlockDim](../../../../app/zbal/src/csrc/operators/npu/aicore/common/zbal_kernel_utils.h) 的 `allgatherRankCoreMapping` 中补充 A5 数据点。
 - [ ] A5 性能基线文档 `prof_npu_a5_dc.md` / `prof_npu_a5_classic.md` 的具体数值待 A5 环境实测后填充。
 
 ---
